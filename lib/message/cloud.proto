@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package cloud;
+
+message CloudMessage {
+  enum Type {
+    REQUEST = 0;
+    RESPONSE = 1;
+    NOTIFICATION = 2;
+  }
+
+  enum Operation {
+    // API operations
+    PUT = 0;
+    GET = 1;
+    DELETE = 2;
+    JOIN_CLUSTER = 3;
+
+    // P2P operations
+    CREATE_PARTITIONS = 4;
+    STEAL_PARTITIONS = 5;
+    DROP_PARTITIONS = 6;
+
+    TRANSFER_PARTITION = 7;
+
+    PARTITIONS_ADDED = 8;
+    PARTITIONS_REMOVED = 9;
+
+    // RAFT
+    RAFT_HEARTBEAT = 10;
+    RAFT_APPEND_ENTRIES = 11;
+    RAFT_VOTE = 12;
+    RAFT_ADD_NODE = 13;
+    RAFT_REMOVE_NODE = 14;
+    RAFT_DROPPED_NODE = 15;
+    RAFT_GET_LEADER = 16;
+    RAFT_DIRECT_GET = 17;
+
+    //API transaction operations
+    TX_CLT_BEGIN = 18;
+    TX_CLT_COMMIT = 19;
+    TX_CLT_ABORT = 20;
+    TX_CLT_GET = 21;
+    TX_CLT_PUT = 22;
+    TX_CLT_DELETE = 23;
+    TX_BEGIN = 24;
+    TX_COMMIT = 25;
+    TX_ABORT = 26;
+    TX_GET = 27;
+    TX_PUT = 28;
+    TX_DELETE = 29;
+  }
+
+  message KeyValuePair {
+    string key = 1;
+    string value = 2;
+  }
+
+  message LogEntry {
+    uint64 term = 1;
+    CloudMessage cmd = 2;
+  }
+
+  message ClusterAddress {
+    string address = 1;
+  }
+
+  message Partition {
+    uint32 id = 1;
+    string peer = 2;
+  }
+
+  // type and operation
+  Type type = 1;
+  Operation operation = 2;
+
+  // return code and message
+  bool success = 3;
+  string message = 4;
+
+  // payload for API operations
+  repeated KeyValuePair kvp = 5;
+  ClusterAddress address = 6;
+
+  // payload for P2P operations
+  repeated Partition partition = 7;
+
+  // payload for RAFT operations
+  uint64 term = 8;
+  uint64 log_index = 9;
+  uint64 log_term = 10;
+  uint64 leader_commit = 11;
+  repeated LogEntry entries = 12;
+
+  // payload for TX operations
+  string tx_id = 13;
+}

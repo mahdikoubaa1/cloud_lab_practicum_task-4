@@ -1,0 +1,54 @@
+{
+    "tests": [
+        {
+            "name": "Build",
+            "setup": "",
+            "run": "mkdir build && cd build && cmake ..&& timeout -s9 2m make && cp ctl-test .. && cp kvs-test ..",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 10,
+            "points": null
+        },
+        {
+            "name": "Test 2 Phase Commit",
+            "setup": "",
+            "run": "timeout -s9 5m python3 tests/test_two_phase_commit.py",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 10,
+            "points": 6
+        },
+        {
+            "name": "Test Concurrent Transactions",
+            "setup": "",
+            "run": "timeout -s9 2m python3 tests/test_concurrent_transactions.py",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 10,
+            "points": 7
+        },
+        {
+            "name": "Test Transaction Rollback",
+            "setup": "",
+            "run": "timeout -s9 2m python3 tests/test_transaction_rollback.py",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 10,
+            "points": 6
+        },
+        {
+            "name": "Test Transaction Abort",
+            "setup": "",
+            "run": "timeout -s9 2m python3 tests/test_transaction_abort.py",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 10,
+            "points": 6
+        }
+    ]
+}
