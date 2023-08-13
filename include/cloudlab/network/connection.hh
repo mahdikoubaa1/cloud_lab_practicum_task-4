@@ -10,7 +10,7 @@ class CloudMessage;
 
 namespace cloudlab {
 
-const auto max_message_size = 4096;
+const auto max_message_size = 10000000000000;
 
 /**
  * Representation of a (TCP) network connection.

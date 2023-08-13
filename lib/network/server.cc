@@ -10,6 +10,7 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 #include <event2/listener.h>
+#include <event2/thread.h>
 #include <netdb.h>
 #include <sys/socket.h>
 
@@ -52,9 +53,10 @@ auto Server::server(const std::string &address, SPMCQueue<void *> &bev_queue)
     throw std::runtime_error{"getaddrinfo() failed"};
   }
 
+  evthread_use_pthreads();  // enable multithreading support
+
   struct event_base *base{};
   struct evconnlistener *listener{};
-  struct event *signal_event{};
 
   base = event_base_new();
   if (!base) {
@@ -91,7 +93,8 @@ auto Server::server(const std::string &address, SPMCQueue<void *> &bev_queue)
     auto *base = base_and_bev_queue->first;
     auto *bev_queue = base_and_bev_queue->second;
 
-    auto *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
+    auto *bev = bufferevent_socket_new(
+        base, fd, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     if (!bev) {
       throw std::runtime_error{"could not construct bufferevent"};
     }

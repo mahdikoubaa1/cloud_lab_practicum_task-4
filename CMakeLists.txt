@@ -9,12 +9,31 @@ include(FetchContent)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+# set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} ${CMAKE_CXX_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping")
+add_compile_options(-Wall -Wextra -pedantic -Wformat=2 -g -Wno-unused -pthread)
 
+
+#detect dependencies
 find_package(Threads REQUIRED)
 find_package(GTest REQUIRED)
 find_package(RocksDB REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibEvent REQUIRED)
+
+find_library(CLOUDLAB_LIBEVENT event REQUIRED)
+if (CLOUDLAB_LIBEVENT)
+    message(STATUS "Found libevent: " ${CLOUDLAB_LIBEVENT})
+else ()
+    message(FATAL_ERROR "libevent not found")
+endif ()
+
+find_library(CLOUDLAB_LIBEVENT_PTHREADS event_pthreads REQUIRED)
+if (CLOUDLAB_LIBEVENT_PTHREADS)
+    message(STATUS "Found libevent_pthreads: " ${CLOUDLAB_LIBEVENT_PTHREADS})
+else ()
+    message(FATAL_ERROR "libevent_pthreads not found")
+endif ()
 
 FetchContent_Declare(fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
@@ -62,7 +81,9 @@ target_link_libraries(cloudlab
         PRIVATE fmt::fmt
         PRIVATE ${ROCKSDB_LIBRARY}
         PRIVATE Threads::Threads
-        PRIVATE ${LIBEVENT_LIBRARY})
+        PRIVATE ${LIBEVENT_LIBRARY}
+        PRIVATE ${CLOUDLAB_LIBEVENT}
+        PRIVATE ${CLOUDLAB_LIBEVENT_PTHREADS})
 
 # ctl executable
 add_executable(ctl-test src/ctl.cc include/cloudlab/argh.hh)
@@ -71,3 +92,7 @@ target_link_libraries(ctl-test cloudlab fmt::fmt)
 # kvs executable
 add_executable(kvs-test src/kvs.cc include/cloudlab/argh.hh)
 target_link_libraries(kvs-test cloudlab fmt::fmt)
+
+# tests_clt
+add_executable(tests_clt src/tests_clt.cc include/cloudlab/argh.hh)
+target_link_libraries(tests_clt cloudlab fmt::fmt)

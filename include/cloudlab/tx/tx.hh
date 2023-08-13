@@ -29,7 +29,9 @@ class TXManager {
   using RoutingPtr = Routing*;
   using PairVec = std::vector<std::pair<std::string, std::string>>;
   using KeySet = std::set<std::string>;
+  using TransactionPartitionsMap = std::map<std::string, std::unordered_set<uint32_t>>;
   using TransactionKeysMap = std::map<std::string, KeySet>;
+  using TransactionBeginMap = std::map<std::string, bool>;
 
   auto SetRole(const TXRole& _val) -> void {
     role = _val;
@@ -50,7 +52,9 @@ class TXManager {
 
   auto HandleMessage(const cloud::CloudMessage& request,
                      cloud::CloudMessage& response) -> void;
-
+  auto IsCoordinator() -> bool {
+    return GetRole() == TXRole::COORDINATOR;
+  }
  private:
   auto HandleBeginCoordinator(const cloud::CloudMessage& request,
                               cloud::CloudMessage& response) -> void;
@@ -80,14 +84,16 @@ class TXManager {
   auto GetRole() -> TXRole {
     return role;
   }
-  auto IsCoordinator() -> bool {
-    return GetRole() == TXRole::COORDINATOR;
-  }
+
 
   RoutingPtr routing{};
   PartitionsPtr partitions{};
   TXRole role{TXRole::PARTICIPANT};
   TransactionKeysMap transactionKeysMap{};
+  TransactionBeginMap transactionBeginMap{};
+  TransactionPartitionsMap  transactionPartitionsMap{};
+  std::mutex mtx;
+
 };
 
 }  // namespace cloudlab

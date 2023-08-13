@@ -102,13 +102,13 @@ class P2PHandler : public ServerHandler {
   auto redistribute_partitions() -> void;
 
   // partitions stored on this peer: [partition ID -> KVS]
+  Routing* routing;
   std::unique_ptr<std::unordered_map<uint32_t, std::unique_ptr<KVS>>>
       partitions;
 
   std::unique_ptr<std::unordered_set<SocketAddress>> nodes;
 
   std::unique_ptr<Raft> raft;
-  Routing* routing;
   std::mutex mtx;
   // Transactions Manager. Does it's own message handling.
   std::unique_ptr<TXManager> txManager;

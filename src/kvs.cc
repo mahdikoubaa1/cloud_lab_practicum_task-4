@@ -29,13 +29,13 @@ auto main(int argc, char* argv[]) -> int {
     p2p_handler.set_raft_leader();
     p2p_handler.set_tx_coordinator();
     auto p2p_thread = p2p_server.run();
-    auto raft_thread = p2p_handler.raft_run();
+    // auto raft_thread = p2p_handler.raft_run();
 
     fmt::print("leader up and running ...\n");
 
     api_thread.join();
     p2p_thread.join();
-    raft_thread.join();
+    // raft_thread.join();
   } else {
     std::unique_ptr<Routing> routing = std::make_unique<Routing>(p2p_address);
 
@@ -50,12 +50,12 @@ auto main(int argc, char* argv[]) -> int {
     auto p2p_server = Server(p2p_address, p2p_handler);
     p2p_handler.set_raft_follower();
     auto p2p_thread = p2p_server.run();
-    auto raft_thread = p2p_handler.raft_run();
+    // auto raft_thread = p2p_handler.raft_run();
 
     fmt::print("KVS up and running ...\n");
 
     api_thread.join();
     p2p_thread.join();
-    raft_thread.join();
+    // raft_thread.join();
   }
 }

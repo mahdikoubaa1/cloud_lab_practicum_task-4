@@ -65,37 +65,88 @@ auto KVS::clear() -> bool {
 
 auto KVS::tx_begin(const std::string& txId) -> std::tuple<bool, std::string> {
   // TODO(you)
-  return {false, "ERROR"};
-  // return {true, "OK"}
+  if (!transactions.contains(txId)) {
+    transactions.insert({txId, db->BeginTransaction(rocksdb::WriteOptions())});
+  }
+  return {true, "OK"};
 }
 
 auto KVS::tx_commit(const std::string& txId) -> std::tuple<bool, std::string> {
   // TODO(you)
-  return {false, "ERROR"};
-  // return {true, "OK"}
+  auto toerase = transactions.find(txId);
+  if (toerase != transactions.end()) {
+    std::tuple<bool, std::string> ret;
+    if (toerase->second->Commit().ok()) {
+      ret = {true, "OK"};
+    } else {
+      ret = {false, "ERROR"};
+    }
+    delete toerase->second;
+    transactions.erase(toerase);
+    return ret;
+  }
+  return {true, "OK"};
 }
 auto KVS::tx_abort(const std::string& txId) -> std::tuple<bool, std::string> {
-  // TODO(you)
-  return {false, "ERROR"};
-  // return {true, "OK"}
+  auto toerase = transactions.find(txId);
+  if (toerase != transactions.end()) {
+    std::tuple<bool, std::string> ret;
+    if (toerase->second->Rollback().ok()) {
+      ret = {true, "OK"};
+    } else {
+      ret = {false, "ERROR"};
+    }
+    delete toerase->second;
+    transactions.erase(toerase);
+    return ret;
+  }
+  return {true, "OK"};
 }
 auto KVS::tx_get(const std::string& txId, const std::string& key,
                  std::string& result) -> std::tuple<bool, std::string> {
   // TODO(you)
+  auto inquestion = transactions.find(txId);
+  if (inquestion != transactions.end()) {
+    std::tuple<bool, std::string> ret;
+    if (inquestion->second->GetForUpdate(rocksdb::ReadOptions(), key, &result)
+            .ok()) {
+      ret = {true, "OK"};
+    } else {
+      ret = {false, "ERROR"};
+    }
+    return ret;
+  }
   return {false, "ERROR"};
-  // return {true, "OK"}
 }
 auto KVS::tx_put(const std::string& txId, const std::string& key,
                  const std::string& value) -> std::tuple<bool, std::string> {
   // TODO(you)
+  auto inquestion = transactions.find(txId);
+  if (inquestion != transactions.end()) {
+    std::tuple<bool, std::string> ret;
+    if (inquestion->second->Put(key, value).ok()) {
+      ret = {true, "OK"};
+    } else {
+      ret = {false, "ERROR"};
+    }
+    return ret;
+  }
   return {false, "ERROR"};
-  // return {true, "OK"}
 }
 auto KVS::tx_del(const std::string& txId, const std::string& key)
     -> std::tuple<bool, std::string> {
   // TODO(you)
+  auto inquestion = transactions.find(txId);
+  if (inquestion != transactions.end()) {
+    std::tuple<bool, std::string> ret;
+    if (inquestion->second->Delete(key).ok()) {
+      ret = {true, "OK"};
+    } else {
+      ret = {false, "ERROR"};
+    }
+    return ret;
+  }
   return {false, "ERROR"};
-  // return {true, "OK"}
 }
 
 }  // namespace cloudlab

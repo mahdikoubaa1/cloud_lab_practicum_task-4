@@ -5,7 +5,7 @@
 namespace cloudlab {
 
 auto Parser::HandleGet(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 3)) {
     isError = true;
     return {};
@@ -18,7 +18,7 @@ auto Parser::HandleGet(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandlePut(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 4) || ((size % 2) == 1)) {
     isError = true;
     return {};
@@ -31,7 +31,7 @@ auto Parser::HandlePut(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleDel(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 3)) {
     isError = true;
     return {};
@@ -44,7 +44,7 @@ auto Parser::HandleDel(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleDirectGet(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 3)) {
     isError = true;
     return {};
@@ -57,7 +57,7 @@ auto Parser::HandleDirectGet(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleJoin(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size != 3)) {
     isError = true;
     return {};
@@ -70,7 +70,7 @@ auto Parser::HandleJoin(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleDropped(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size != 2)) {
     isError = true;
     return {};
@@ -81,7 +81,7 @@ auto Parser::HandleDropped(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleLeader(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size != 2)) {
     isError = true;
     return {};
@@ -93,7 +93,7 @@ auto Parser::HandleLeader(const argh::parser& cmdl) -> cloud::CloudMessage {
 }
 
 auto Parser::HandleTxBegin(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 4)) {
     isError = true;
     return {};
@@ -108,7 +108,7 @@ auto Parser::HandleTxBegin(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleTxCommit(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 3)) {
     isError = true;
     return {};
@@ -121,7 +121,7 @@ auto Parser::HandleTxCommit(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleTxAbort(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 3)) {
     isError = true;
     return {};
@@ -134,7 +134,7 @@ auto Parser::HandleTxAbort(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleTxGet(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 4)) {
     isError = true;
     return {};
@@ -149,7 +149,7 @@ auto Parser::HandleTxGet(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleTxPut(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 5) || ((size % 2) == 0)) {
     isError = true;
     return {};
@@ -164,7 +164,7 @@ auto Parser::HandleTxPut(const argh::parser& cmdl) -> cloud::CloudMessage {
   return helper.GetMessage();
 }
 auto Parser::HandleTxDel(const argh::parser& cmdl) -> cloud::CloudMessage {
-  const auto& size = cmdl.pos_args().size();
+  const int& size = cmdl.pos_args().size();
   if ((size < 4)) {
     isError = true;
     return {};

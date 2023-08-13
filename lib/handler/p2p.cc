@@ -1,12 +1,11 @@
 #include "cloudlab/handler/p2p.hh"
 
-#include "fmt/core.h"
-
-#include "cloud.pb.h"
-
 #include <mutex>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "cloud.pb.h"
+#include "fmt/core.h"
 
 namespace cloudlab {
 
@@ -35,14 +34,12 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
   }
 
   // prevent con with same address
-  std::lock_guard<std::mutex> lck(mtx);
-
   if (raft->leader()) {
     routing->set_partitions_to_cluster_size();
   }
-
   switch (request.operation()) {
     case cloud::CloudMessage_Operation_PUT: {
+      assert(false);
       if (raft->leader()) {
         handle_key_operation_leader(request, response);
       } else {
@@ -51,6 +48,7 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
       break;
     }
     case cloud::CloudMessage_Operation_GET: {
+      assert(false);
       if (raft->leader()) {
         handle_key_operation_leader(request, response);
       } else {
@@ -59,6 +57,7 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
       break;
     }
     case cloud::CloudMessage_Operation_DELETE: {
+      assert(false);
       if (raft->leader()) {
         handle_key_operation_leader(request, response);
       } else {
@@ -67,7 +66,8 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
       break;
     }
     case cloud::CloudMessage_Operation_JOIN_CLUSTER: {
-      if (raft->leader()) {
+      //   if (raft->leader()) {
+      if (txManager->IsCoordinator()) {
         handle_join_cluster_leader(request, response);
       } else {
         handle_join_cluster(request, response);
@@ -99,26 +99,32 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_APPEND_ENTRIES: {
+      assert(false);
       handle_raft_append_entries(request, response);
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_ADD_NODE: {
+      assert(false);
       handle_raft_add_node(request, response);
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_REMOVE_NODE: {
+      assert(false);
       handle_raft_remove_node(request, response);
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_VOTE: {
+      assert(false);
       handle_raft_vote(request, response);
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_DROPPED_NODE: {
+      assert(false);
       handle_raft_dropped_node(request, response);
       break;
     }
     case cloud::CloudMessage_Operation_RAFT_GET_LEADER: {
+      assert(false);
       handle_raft_get_leader(request, response);
       break;
     }
@@ -127,6 +133,7 @@ auto P2PHandler::handle_connection(Connection& con) -> void {
     //   break;
     // }
     case cloud::CloudMessage_Operation_RAFT_DIRECT_GET: {
+      assert(false);
       handle_raft_direct_get(request, response);
       break;
     }
@@ -245,42 +252,44 @@ auto P2PHandler::handle_join_cluster_leader(const cloud::CloudMessage& msg,
 
   if (peer.has_value()) {
     std::cout << "from: " << peer.value().string() << std::endl;
-    cloud::CloudMessage add_msg{};
-    add_msg.set_type(cloud::CloudMessage_Type_REQUEST);
-    add_msg.set_operation(cloud::CloudMessage_Operation_RAFT_ADD_NODE);
+    // Lets cancel this part
+    /*
+      cloud::CloudMessage add_msg{};
+      add_msg.set_type(cloud::CloudMessage_Type_REQUEST);
+      add_msg.set_operation(cloud::CloudMessage_Operation_RAFT_ADD_NODE);
 
-    auto* partition = add_msg.add_partition();
-    // setting 1 as place holder
-    partition->set_id(1);
-    partition->set_peer(peer.value().string());
+      auto* partition = add_msg.add_partition();
+      // setting 1 as place holder
+      partition->set_id(1);
+      partition->set_peer(peer.value().string());
 
-    // notify other nodes of this new node
-    raft->broadcast(add_msg);
-    // std::cout << "About to send broadcast_multi" << std::endl;
+      // notify other nodes of this new node
+      // raft->broadcast(add_msg);
+      // std::cout << "About to send broadcast_multi" << std::endl;
 
-    // notify this new node of other existing nodes
-    raft->broadcast_multi(peer.value());
+      // notify this new node of other existing nodes
+      // raft->broadcast_multi(peer.value());
 
-    // send all existing kvp to new node.
-    cloud::CloudMessage kvp_msg{};
-    kvp_msg.set_type(cloud::CloudMessage_Type_REQUEST);
-    kvp_msg.set_operation(cloud::CloudMessage_Operation_RAFT_APPEND_ENTRIES);
-    kvp_msg.set_success(true);
-    kvp_msg.mutable_address()->set_address(
-        routing->get_backend_address().string());
-    std::vector<std::pair<std::string, std::string>> buffer;
-    raft->get_all(buffer);
-    std::cout << "kvp to send" << std::endl;
-    for (auto& [key, value] : buffer) {
-      auto* kvp = kvp_msg.add_kvp();
-      std::cout << "key: " << key << ", value: " << value << std::endl;
-      kvp->set_key(key);
-      kvp->set_value(value);
-    }
+      // send all existing kvp to new node.
+      cloud::CloudMessage kvp_msg{};
+      kvp_msg.set_type(cloud::CloudMessage_Type_REQUEST);
+      kvp_msg.set_operation(cloud::CloudMessage_Operation_RAFT_APPEND_ENTRIES);
+      kvp_msg.set_success(true);
+      kvp_msg.mutable_address()->set_address(
+          routing->get_backend_address().string());
+      std::vector<std::pair<std::string, std::string>> buffer;
+      // raft->get_all(buffer);
+      std::cout << "kvp to send" << std::endl;
+      for (auto& [key, value] : buffer) {
+        auto* kvp = kvp_msg.add_kvp();
+        std::cout << "key: " << key << ", value: " << value << std::endl;
+        kvp->set_key(key);
+        kvp->set_value(value);
+      }
 
-    Connection con{peer.value().string()};
-    con.send(kvp_msg);
-
+      Connection con{peer.value().string()};
+      con.send(kvp_msg);
+  */
     add_new_node(peer.value());
   }
 }
@@ -404,6 +413,7 @@ auto P2PHandler::handle_create_partitions(const cloud::CloudMessage& msg,
 
   // create new partitions
   for (const auto& partition : msg.partition()) {
+    std::cout << "creating partition " << partition.id() << std::endl;
     auto hash = std::hash<SocketAddress>()(routing->get_backend_address());
     auto path = fmt::format("/tmp/{}-{}", hash, partition.id());
     partitions->insert({partition.id(), std::make_unique<KVS>(path)});
@@ -438,13 +448,13 @@ auto P2PHandler::add_new_node(const SocketAddress& peer) -> void {
       nodes->insert(peer);
       for (auto partition = 0; partition < cluster_partitions; partition++) {
         routing->add_peer(partition, peer);
-        raft->add_peer(peer);
+        // raft->add_peer(peer);
       }
     }
   } else {
     // nth node to join needs to steal partitions from other nodes
     nodes->insert(peer);
-    raft->add_peer(peer);
+    // raft->add_peer(peer);
     // FIXME: do not re-distribute partitions during ongoing re-distribution
     redistribute_partitions();
   }
@@ -513,7 +523,7 @@ auto P2PHandler::handle_partitions_added(const cloud::CloudMessage& msg,
   std::cout << "in P2PHandler::handle_partitions_added" << std::endl;
   for (const auto& partition : msg.partition()) {
     routing->add_peer(partition.id(), SocketAddress{partition.peer()});
-    raft->add_peer(SocketAddress{partition.peer()});
+    // raft->add_peer(SocketAddress{partition.peer()});
   }
 }
 
@@ -665,7 +675,7 @@ auto P2PHandler::handle_transfer_partition(const cloud::CloudMessage& msg,
 auto P2PHandler::handle_raft_append_entries(const cloud::CloudMessage& msg,
                                             cloud::CloudMessage& response)
     -> void {
-  // std::cout << "P2PHandler::handle_raft_append_entries" << std::endl;
+  std::cout << "P2PHandler::handle_raft_append_entries" << std::endl;
   std::string leader_addr;
   raft->reset_election_timer();
   auto address = msg.address().address();
@@ -697,6 +707,7 @@ auto P2PHandler::handle_raft_append_entries(const cloud::CloudMessage& msg,
 
 auto P2PHandler::handle_raft_vote(const cloud::CloudMessage& msg,
                                   cloud::CloudMessage& response) -> void {
+  std::cout << "P2PHandler::handle_raft_vote" << std::endl;
   // got response from its own vote request
   if (msg.type() == cloud::CloudMessage_Type_RESPONSE) {
     std::cout << "got vote response" << std::endl;
@@ -778,7 +789,7 @@ auto P2PHandler::handle_raft_remove_node(const cloud::CloudMessage& msg,
 auto P2PHandler::handle_raft_dropped_node(const cloud::CloudMessage& msg,
                                           cloud::CloudMessage& response)
     -> void {
-  // std::cout << "in P2PHandler::handle_raft_dropped_node" << std::endl;
+  std::cout << "in P2PHandler::handle_raft_dropped_node" << std::endl;
   std::vector<std::string> result;
   response.set_type(cloud::CloudMessage_Type_RESPONSE);
   response.set_operation(cloud::CloudMessage_Operation_RAFT_DROPPED_NODE);
@@ -802,7 +813,7 @@ auto P2PHandler::handle_raft_dropped_node(const cloud::CloudMessage& msg,
 
 auto P2PHandler::handle_raft_get_leader(const cloud::CloudMessage& msg,
                                         cloud::CloudMessage& response) -> void {
-  // std::cout << "in P2PHandler::handle_raft_get_leader" << std::endl;
+  std::cout << "in P2PHandler::handle_raft_get_leader" << std::endl;
   std::string result;
   response.set_type(cloud::CloudMessage_Type_RESPONSE);
   response.set_operation(cloud::CloudMessage_Operation_RAFT_GET_LEADER);
