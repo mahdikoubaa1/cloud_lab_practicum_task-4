@@ -2,6 +2,7 @@
 
 In this task, you will extend the distrubuted key-value store by implementing a transaction mechanism on top of it. This will allow to operate on multiple keys in an atomic manner.
 
+
 ## The 2 Phase Commit Protocol (2PC)
 
 To implement transactions on top of our distributed KVS, we use the **2 Phase Commit (2PC)** protocol. For concurrency control we use **2 Phase Locking (2PL)**. Before you start implementing your solution, you should familiarize yourselves with these concepts by watching the lecture or consulting the extensive resources online.
